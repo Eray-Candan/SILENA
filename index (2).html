@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RİTİM // Saf Alışkanlık Akışı</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Exact warm alabaster/ivory white from the uploaded image */
+            --pure-surface: #F3F1ED;
+            --pure-card: #FAF9F6;
+            --ink-black: #080808;
+            --ink-muted: #6E6D6A;
+            --ink-subtle: #DEDBD5;
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--pure-surface);
+            color: var(--ink-black);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            selection-background-color: #080808;
+            selection-color: #F3F1ED;
+        }
+
+        h1, h2, h3, .font-display {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Smooth custom scrollbar that blends into the white canvas */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--pure-surface);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D5D2CC;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9E9B95;
+        }
+
+        /* ==========================================
+           EXACT PILL BARS FROM THE IMAGE + MOTION
+           ========================================== */
+        .pill-column-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding: 0 6px;
+        }
+
+        .pill-bar-track {
+            height: 220px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            position: relative;
+        }
+
+        .pill-bar {
+            width: 15px;
+            border-radius: 9999px;
+            /* Ultra-smooth spring-like cubic-bezier for height & transform changes */
+            transition: 
+                height 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                background 0.45s ease,
+                box-shadow 0.5s ease,
+                opacity 0.4s ease;
+            transform-origin: bottom center;
+            will-change: height, transform;
+        }
+
+        /* Subtle Ghost Track showing full daily potential behind each bar */
+        .pill-bar-track::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 15px;
+            height: 100%;
+            border-radius: 9999px;
+            background: rgba(8, 8, 8, 0.035);
+            opacity: 0;
+            transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        .pill-column-group:hover .pill-bar-track::before,
+        .pill-column-group.active .pill-bar-track::before {
+            opacity: 1;
+        }
+
+        @media (min-width: 640px) {
+            .pill-bar {
+                width: 17px;
+            }
+            .pill-bar-track::before {
+                width: 17px;
+            }
+            .pill-bar-track {
+                height: 240px;
+            }
+        }
+
+        /* Unselected solid black bar (exact match to image) */
+        .pill-bar-black {
+            background: #050505;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+        }
+
+        .pill-column-group:hover .pill-bar-black {
+            transform: scaleY(1.04) translateY(-2px);
+            background: #1F1F1F;
+        }
+
+        /* Selected Glowing Metallic White/Silver Gradient Bar (exact match to Thursday 'T' in image) */
+        .pill-bar-metallic {
+            background: linear-gradient(
+                180deg,
+                #D5D3CE 0%,
+                #EAE8E4 24%,
+                #FFFFFF 47%,
+                #FFFFFF 55%,
+                #CBC9C4 78%,
+                #7D7B76 100%
+            );
+            box-shadow: 
+                0 0 28px rgba(255, 255, 255, 0.95),
+                0 10px 22px rgba(0, 0, 0, 0.08),
+                inset 0 0 2px #FFFFFF;
+            transform: translateY(-2px);
+        }
+
+        .pill-column-group:hover .pill-bar-metallic {
+            transform: scaleY(1.03) translateY(-3px);
+        }
+
+        /* Day letter below each bar (S M T W T F S) */
+        .day-letter {
+            margin-top: 28px;
+            font-size: 16px;
+            font-weight: 400;
+            color: #6B6A67;
+            letter-spacing: 0.02em;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .pill-column-group.active .day-letter {
+            color: #080808;
+            font-weight: 600;
+            transform: translateY(2px);
+        }
+
+        .pill-column-group:hover .day-letter {
+            color: #080808;
+        }
+
+        /* Subtle floating completion percentage & next task preview on hover */
+        .pill-tooltip {
+            position: absolute;
+            top: -44px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #6E6D6A;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 20;
+        }
+
+        .pill-tooltip-sub {
+            font-size: 9px;
+            letter-spacing: 0.04em;
+            color: #8C8A84;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .pill-column-group:hover .pill-tooltip,
+        .pill-column-group.active .pill-tooltip {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .pill-column-group:hover .pill-tooltip-sub {
+            opacity: 1;
+        }
+
+        .pill-column-group.active .pill-tooltip {
+            color: #080808;
+            font-weight: 600;
+        }
+
+        /* ==========================================
+           SMOOTH SCROLL & CONTENT MOTION ANIMATIONS
+           ========================================== */
+        .reveal-section {
+            opacity: 0;
+            transform: translateY(36px);
+            transition: 
+                opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Staggered task cards animation when switching days */
+        @keyframes taskSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(18px) scale(0.99);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .task-card-anim {
+            animation: taskSlideIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Minimalist Task Row Styling */
+        .task-row {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(8, 8, 8, 0.06);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .task-row:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(8, 8, 8, 0.14);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.04);
+        }
+
+        .task-row.completed-row {
+            background: rgba(255, 255, 255, 0.32);
+            border-color: rgba(8, 8, 8, 0.04);
+        }
+
+        .task-row.focusing-row {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(8, 8, 8, 0.22);
+            box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.07);
+        }
+
+        /* Custom Pill Checkbox matching the main chart aesthetic */
+        .capsule-check {
+            width: 12px;
+            height: 28px;
+            border-radius: 9999px;
+            border: 1.5px solid #080808;
+            transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .task-row:hover .capsule-check {
+            transform: scaleY(1.1);
+        }
+
+        .task-row.completed-row .capsule-check {
+            background: #080808;
+            border-color: #080808;
+            height: 32px;
+        }
+
+        /* Breathing Metallic Capsule when Focus Timer is Active */
+        @keyframes metallicBreathe {
+            0%, 100% {
+                transform: scaleY(1);
+                box-shadow: 0 0 12px rgba(255, 255, 255, 0.9), 0 4px 10px rgba(0, 0, 0, 0.12);
+            }
+            50% {
+                transform: scaleY(1.22);
+                box-shadow: 0 0 22px rgba(255, 255, 255, 1), 0 6px 14px rgba(0, 0, 0, 0.18);
+            }
+        }
+
+        .task-row.focusing-row .capsule-check {
+            border-color: #9E9B95;
+            background: linear-gradient(180deg, #D5D3CE 0%, #FFFFFF 50%, #8C8A84 100%);
+            animation: metallicBreathe 2.4s ease-in-out infinite;
+        }
+
+        /* Hairline 1px Progress Bar at the bottom of Focusing Task Card */
+        .focus-hairline {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            background: #080808;
+            transition: width 0.3s linear;
+        }
+
+        /* Subtle scroll cue breathing animation */
+        @keyframes gentleFloat {
+            0%, 100% {
+                transform: translateY(0);
+                opacity: 0.35;
+            }
+            50% {
+                transform: translateY(6px);
+                opacity: 0.75;
+            }
+        }
+
+        .scroll-whisper {
+            animation: gentleFloat 3.2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-black selection:text-[#F3F1ED]">
+
+    <!-- =====================================================================
+         1. ANA SAYFA (HERO): EKRAN AÇILDIĞINDA SADECE GÖRSELDEKİ MİMARİ GÖRÜNÜR
+         ===================================================================== -->
+    <section id="heroCanvas" class="relative min-h-screen w-full flex flex-col items-center justify-center px-6 select-none">
+        
+        <!-- Centerpiece: The Exact 7 Bars & Letters from the Reference Image -->
+        <div class="flex items-end justify-center gap-6 sm:gap-11 md:gap-14" id="heroBarsContainer">
+            <!-- Dynamically rendered by JS with smooth height physics -->
+        </div>
+
+        <!-- Ultra-subtle, nearly invisible scroll whisper at the very bottom -->
+        <button 
+            onclick="scrollToDailyFlow()" 
+            aria-label="Seçili günün görevlerine kaydır"
+            class="scroll-whisper absolute bottom-8 flex flex-col items-center gap-2 text-[#6E6D6A] hover:text-[#080808] transition-colors cursor-pointer group"
+        >
+            <span id="heroWhisperText" class="text-[11px] tracking-[0.22em] uppercase font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                Perşembe Akışı
+            </span>
+            <div class="w-[1.5px] h-7 bg-[#080808]/30 rounded-full overflow-hidden">
+                <div class="w-full h-1/2 bg-[#080808] rounded-full"></div>
+            </div>
+        </button>
+    </section>
+
+    <!-- =====================================================================
+         2. AŞAĞI KAYDIRDIKÇA AÇILAN SEÇİLİ GÜNÜN GÖREVLERİ & RİTİM AKIŞI
+         ===================================================================== -->
+    <main id="dailyFlowSection" class="max-w-2xl mx-auto px-6 pt-12 pb-36">
+        
+        <div class="reveal-section" id="flowContainer">
+            
+            <!-- Sticky Minimalist Mini-Bar (Appears smoothly while scrolling down so you can still switch days) -->
+            <div class="sticky top-6 z-30 mb-12 flex justify-center">
+                <div class="inline-flex items-center gap-2 sm:gap-3 px-5 py-2.5 rounded-full bg-[#FAF9F6]/85 backdrop-blur-md border border-black/[0.07] shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+                    <button 
+                        onclick="scrollToTopHero()" 
+                        class="text-[11px] font-medium tracking-wider uppercase text-[#6E6D6A] hover:text-black pr-2 border-r border-black/10 transition"
+                        title="Ana Grafiğe Çık"
+                    >
+                        ↑ Grafik
+                    </button>
+                    <div class="flex items-center gap-1.5 sm:gap-2" id="stickyMiniDays">
+                        <!-- Mini day pills rendered via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selected Day Header & Rhythm Status -->
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-8 border-b border-black/[0.08]">
+                <div>
+                    <div class="flex items-center gap-2.5 text-xs uppercase tracking-[0.2em] text-[#6E6D6A] font-medium">
+                        <span id="activeDayCode">GÜN 05</span>
+                        <span>•</span>
+                        <span id="activeDayTempoLabel">ZİRVE RİTMİ</span>
+                    </div>
+                    <h1 id="activeDayTitle" class="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-[#080808] mt-2 transition-all duration-500">
+                        Perşembe
+                    </h1>
+                </div>
+
+                <!-- Minimalist Completion Ratio Pill -->
+                <div class="flex items-baseline gap-3 self-start sm:self-end">
+                    <div class="text-right">
+                        <span class="block text-[11px] uppercase tracking-widest text-[#6E6D6A]">Günlük Oran</span>
+                        <span id="activeDayCounterText" class="text-xs text-[#6E6D6A]">6 / 6 Görev</span>
+                    </div>
+                    <div id="activeDayPercentBig" class="font-display text-3xl sm:text-4xl font-light tracking-tighter text-[#080808]">
+                        100%
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Rhythm Tempo Selector (Adjusts to user's energy) -->
+            <div class="mt-8 flex flex-wrap items-center justify-between gap-3 py-3.5 px-5 rounded-2xl bg-black/[0.025] border border-black/[0.05]">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-2 h-2 rounded-full bg-[#080808]"></span>
+                    <span class="text-xs font-medium text-[#080808]" id="rhythmInsightText">
+                        Bugünkü ritminiz tam senkronizasyonda.
+                    </span>
+                </div>
+                <div class="flex items-center gap-1.5 text-[11px]">
+                    <button onclick="filterByRhythm('ALL')" data-rhythm="ALL" class="rhythm-btn px-3 py-1 rounded-full bg-[#080808] text-[#F3F1ED] font-medium transition">
+                        Tümü
+                    </button>
+                    <button onclick="filterByRhythm('SABAH')" data-rhythm="SABAH" class="rhythm-btn px-3 py-1 rounded-full text-[#6E6D6A] hover:text-[#080808] transition">
+                        Sabah
+                    </button>
+                    <button onclick="filterByRhythm('GÜN İÇİ')" data-rhythm="GÜN İÇİ" class="rhythm-btn px-3 py-1 rounded-full text-[#6E6D6A] hover:text-[#080808] transition">
+                        Gün İçi
+                    </button>
+                    <button onclick="filterByRhythm('AKŞAM')" data-rhythm="AKŞAM" class="rhythm-btn px-3 py-1 rounded-full text-[#6E6D6A] hover:text-[#080808] transition">
+                        Akşam
+                    </button>
+                </div>
+            </div>
+
+            <!-- Smooth Add New Task Input (Directly affects bar size!) -->
+            <form onsubmit="handleAddTask(event)" class="mt-6 relative group">
+                <div class="flex flex-wrap sm:flex-nowrap items-center bg-[#FAF9F6] border border-black/[0.09] focus-within:border-black/40 rounded-2xl p-2 pl-5 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.02)] gap-1">
+                    <input 
+                        type="text" 
+                        id="newTaskInput" 
+                        placeholder="Ritmine yeni bir günlük görev ekle..." 
+                        required
+                        class="w-full bg-transparent text-sm text-[#080808] placeholder-[#6E6D6A]/70 outline-none py-2"
+                    >
+                    <div class="flex items-center w-full sm:w-auto justify-end border-t sm:border-t-0 pt-1.5 sm:pt-0 border-black/5">
+                        <!-- Rhythm Weight Selector (•, ••, •••) -->
+                        <select 
+                            id="newTaskWeight" 
+                            title="Ritim Ağırlığı (Sütun yükseltme etkisi)"
+                            class="bg-transparent text-xs font-semibold text-[#080808] px-2.5 py-2 outline-none cursor-pointer border-l border-black/10"
+                        >
+                            <option value="1">• Hafif</option>
+                            <option value="2" selected>•• Dengeli</option>
+                            <option value="3">••• Derin</option>
+                        </select>
+                        <select 
+                            id="newTaskRhythmPeriod" 
+                            class="bg-transparent text-xs font-medium text-[#6E6D6A] hover:text-[#080808] px-3 py-2 outline-none cursor-pointer border-l border-black/10"
+                        >
+                            <option value="SABAH">Sabah</option>
+                            <option value="GÜN İÇİ" selected>Gün İçi</option>
+                            <option value="AKŞAM">Akşam</option>
+                        </select>
+                        <button 
+                            type="submit" 
+                            class="ml-1.5 px-5 py-2.5 rounded-xl bg-[#080808] hover:bg-neutral-800 text-[#F3F1ED] text-xs font-medium tracking-wide transition active:scale-95 flex-shrink-0"
+                        >
+                            Ekle
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Selected Day's Tasks List -->
+            <div id="tasksListContainer" class="mt-6 space-y-3">
+                <!-- Populated dynamically with staggered motion -->
+            </div>
+
+            <!-- Frameless Single-Line Daily Reflection (Seals the day's rhythm) -->
+            <div class="mt-10 pt-6 border-t border-black/[0.05] flex items-center gap-3 group">
+                <span class="w-1.5 h-4 rounded-full bg-[#080808]/25 group-focus-within:bg-[#080808] transition-colors flex-shrink-0"></span>
+                <input 
+                    type="text" 
+                    id="dailyReflectionInput"
+                    oninput="handleReflectionInput(this.value)"
+                    placeholder="Bugünün ritmini tek bir cümleyle mühürle..."
+                    class="w-full bg-transparent text-xs sm:text-sm italic text-[#080808] placeholder-[#6E6D6A]/60 outline-none py-1 transition-all"
+                >
+                <span id="reflectionSavedBadge" class="text-[10px] uppercase tracking-widest text-[#6E6D6A] opacity-0 transition-opacity duration-300 flex-shrink-0">
+                    Mühürlendi
+                </span>
+            </div>
+
+            <!-- Minimalist Bottom Rhythm Summary & Quick Actions -->
+            <div class="mt-10 pt-8 border-t border-black/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 text-xs text-[#6E6D6A]">
+                <div class="flex items-center gap-6">
+                    <div>
+                        <span class="block text-[10px] uppercase tracking-widest">Haftalık Akış</span>
+                        <span id="weeklyTotalSummary" class="text-sm font-semibold text-[#080808] mt-0.5 block">27 / 42 Tamamlandı</span>
+                    </div>
+                    <div class="h-7 w-[1px] bg-black/10"></div>
+                    <div>
+                        <span class="block text-[10px] uppercase tracking-widest">Kesintisiz Seri</span>
+                        <span id="streakSummary" class="text-sm font-semibold text-[#080808] mt-0.5 block">5 Gün Aktif</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button 
+                        onclick="completeAllForSelectedDay()" 
+                        class="text-xs font-medium text-[#080808] hover:opacity-70 underline underline-offset-4 transition"
+                    >
+                        Günü Tamamla
+                    </button>
+                    <span>•</span>
+                    <button 
+                        onclick="resetToOriginalVisual()" 
+                        class="text-xs text-[#6E6D6A] hover:text-[#080808] transition"
+                        title="Görseldeki ilk oranlara sıfırla"
+                    >
+                        Varsayılan Ritme Dön
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        /* =========================================================================
+         * SAF RİTİM MİMARİSİ - VERİ VE HAREKET MOTORU
+         * =========================================================================
+         * Başlangıç verileri, ekran ilk açıldığında tam olarak kullanıcının yüklediği
+         * görseldeki çubuk boylarını (S M T W T F S) ve parlayan Perşembe (T)
+         * çubuğunu oluşturacak şekilde kalibre edilmiştir.
+         */
+
+        const DAYS = [
+            { index: 0, letter: 'S', name: 'Pazar', code: 'PAZ // 01' },
+            { index: 1, letter: 'M', name: 'Pazartesi', code: 'PZT // 02' },
+            { index: 2, letter: 'T', name: 'Salı', code: 'SAL // 03' },
+            { index: 3, letter: 'W', name: 'Çarşamba', code: 'ÇAR // 04' },
+            { index: 4, letter: 'T', name: 'Perşembe', code: 'PER // 05' },
+            { index: 5, letter: 'F', name: 'Cuma', code: 'CUM // 06' },
+            { index: 6, letter: 'S', name: 'Cumartesi', code: 'CMT // 07' }
+        ];
+
+        // Görseldeki parlayan gümüş/beyaz sütun Perşembe ('T' - index 4)
+        let selectedDayIndex = 4;
+        let currentRhythmFilter = 'ALL';
+
+        // Görseldeki çubuk uzunluklarını birebir veren başlangıç görev matrisi:
+        // S (2/6), M (4/6), T (4/6), W (5/6), T (6/6 - En uzun ve parlayan), F (4/6), S (2/6)
+        const INITIAL_TASKS = [
+            {
+                id: 't1',
+                title: 'Sabah zihin açıklığı ve 10 dakika sessiz odak',
+                period: 'SABAH',
+                duration: '10 dk',
+                minutes: 10,
+                weight: 1,
+                days: [true, true, true, true, true, true, true]
+            },
+            {
+                id: 't2',
+                title: 'Güne başlarken 500ml su ve doğal ışık',
+                period: 'SABAH',
+                duration: '5 dk',
+                minutes: 5,
+                weight: 1,
+                days: [true, true, true, true, true, true, true]
+            },
+            {
+                id: 't3',
+                title: 'Derin çalışma bloğu (Bildirimsiz üretim)',
+                period: 'GÜN İÇİ',
+                duration: '90 dk',
+                minutes: 90,
+                weight: 3,
+                days: [false, true, true, true, true, true, false]
+            },
+            {
+                id: 't4',
+                title: '30 dakika tempolu yürüyüş veya esneme',
+                period: 'GÜN İÇİ',
+                duration: '30 dk',
+                minutes: 30,
+                weight: 1,
+                days: [false, true, true, true, true, true, false]
+            },
+            {
+                id: 't5',
+                title: 'Yaratıcı okuma ve günlük not sentezi',
+                period: 'AKŞAM',
+                duration: '25 dk',
+                minutes: 25,
+                weight: 2,
+                days: [false, false, false, true, true, false, false]
+            },
+            {
+                id: 't6',
+                title: 'Ekranlardan arınma ve ertesi günün ritmini kurma',
+                period: 'AKŞAM',
+                duration: '15 dk',
+                minutes: 15,
+                weight: 2,
+                days: [false, false, false, false, true, false, false]
+            }
+        ];
+
+        const INITIAL_REFLECTIONS = {
+            3: 'Derin odak blokları oldukça verimli geçti.',
+            4: 'Zihin berrak, tüm haftanın en dengeli ve üretken günü.'
+        };
+
+        // Load from localStorage if available, otherwise use exact image preset
+        let tasks = loadTasksFromStorage();
+        let reflections = loadReflectionsFromStorage();
+
+        // Active inline focus timer state
+        let activeFocus = {
+            taskId: null,
+            remainingSeconds: 0,
+            totalSeconds: 0,
+            intervalId: null
+        };
+
+        function loadTasksFromStorage() {
+            try {
+                const saved = localStorage.getItem('ritim_pure_tasks_v1');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        return parsed.map(t => ({
+                            ...t,
+                            weight: t.weight || 1,
+                            minutes: t.minutes || parseInt(t.duration) || 15
+                        }));
+                    }
+                }
+            } catch (e) {}
+            return JSON.parse(JSON.stringify(INITIAL_TASKS));
+        }
+
+        function saveTasksToStorage() {
+            try {
+                localStorage.setItem('ritim_pure_tasks_v1', JSON.stringify(tasks));
+            } catch (e) {}
+        }
+
+        function loadReflectionsFromStorage() {
+            try {
+                const saved = localStorage.getItem('ritim_pure_reflections_v1');
+                if (saved) return JSON.parse(saved);
+            } catch (e) {}
+            return { ...INITIAL_REFLECTIONS };
+        }
+
+        function saveReflectionsToStorage() {
+            try {
+                localStorage.setItem('ritim_pure_reflections_v1', JSON.stringify(reflections));
+            } catch (e) {}
+        }
+
+        // Subtle tactile Web Audio synthesizer (No external sound files needed)
+        let audioCtx = null;
+        function playSoftClick(freq = 520, type = 'sine', duration = 0.06) {
+            try {
+                if (!audioCtx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContext();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+                gain.gain.setValueAtTime(0.035, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                // Ignore audio context restrictions if not yet interacted
+            }
+        }
+
+        // Calculate completion stats for a specific day (0-6) incorporating Rhythm Weight
+        function getDayStats(dayIdx) {
+            const total = tasks.length;
+            if (total === 0) return { completed: 0, total: 0, ratio: 0, nextTaskTitle: '' };
+            let completed = 0;
+            let weightedCompleted = 0;
+            let weightedTotal = 0;
+            let nextTaskTitle = '';
+
+            tasks.forEach(t => {
+                const w = Number(t.weight) || 1;
+                weightedTotal += w;
+                if (t.days[dayIdx]) {
+                    completed++;
+                    weightedCompleted += w;
+                } else if (!nextTaskTitle) {
+                    nextTaskTitle = t.title;
+                }
+            });
+
+            return {
+                completed,
+                total,
+                ratio: weightedTotal > 0 ? (weightedCompleted / weightedTotal) : 0,
+                nextTaskTitle
+            };
+        }
+
+        /* =========================================================================
+         * 1. ANA EKRAN SÜTUNLARINI (S M T W T F S) OLUŞTUR VE GÜNCELLE
+         * ========================================================================= */
+        function renderHeroBars() {
+            const container = document.getElementById('heroBarsContainer');
+            const minBarHeight = 38;  // Minimum capsule height when 0 tasks done
+            const maxBarHeight = 205; // Maximum capsule height when 100% tasks done
+
+            // First time build: create DOM nodes so subsequent height changes animate smoothly!
+            if (container.children.length === 0) {
+                DAYS.forEach((day, idx) => {
+                    const col = document.createElement('div');
+                    col.className = `pill-column-group ${idx === selectedDayIndex ? 'active' : ''}`;
+                    col.id = `hero-col-${idx}`;
+                    col.onclick = () => handleDayClickFromHero(idx);
+
+                    col.innerHTML = `
+                        <div class="pill-tooltip" id="hero-tip-${idx}">
+                            <span id="hero-tip-ratio-${idx}">0%</span>
+                            <span class="pill-tooltip-sub" id="hero-tip-sub-${idx}"></span>
+                        </div>
+                        <div class="pill-bar-track">
+                            <div id="hero-bar-${idx}" class="pill-bar ${idx === selectedDayIndex ? 'pill-bar-metallic' : 'pill-bar-black'}" style="height: ${minBarHeight}px"></div>
+                        </div>
+                        <span class="day-letter">${day.letter}</span>
+                    `;
+                    container.appendChild(col);
+                });
+            }
+
+            // Smoothly update heights, active metallic styling, and floating micro-preview
+            DAYS.forEach((day, idx) => {
+                const stats = getDayStats(idx);
+                const targetHeight = Math.round(minBarHeight + stats.ratio * (maxBarHeight - minBarHeight));
+                
+                const colEl = document.getElementById(`hero-col-${idx}`);
+                const barEl = document.getElementById(`hero-bar-${idx}`);
+                const tipRatioEl = document.getElementById(`hero-tip-ratio-${idx}`);
+                const tipSubEl = document.getElementById(`hero-tip-sub-${idx}`);
+
+                if (colEl && barEl && tipRatioEl && tipSubEl) {
+                    const isSelected = idx === selectedDayIndex;
+                    colEl.className = `pill-column-group ${isSelected ? 'active' : ''}`;
+                    barEl.className = `pill-bar ${isSelected ? 'pill-bar-metallic' : 'pill-bar-black'}`;
+                    barEl.style.height = `${targetHeight}px`;
+                    tipRatioEl.textContent = `${stats.completed}/${stats.total}`;
+                    
+                    if (stats.completed === stats.total && stats.total > 0) {
+                        tipSubEl.textContent = reflections[idx] ? `“${reflections[idx]}”` : 'Tam रezonans';
+                    } else if (stats.nextTaskTitle) {
+                        tipSubEl.textContent = stats.nextTaskTitle;
+                    } else {
+                        tipSubEl.textContent = '';
+                    }
+                }
+            });
+
+            // Update subtle bottom whisper text
+            const whisper = document.getElementById('heroWhisperText');
+            if (whisper) {
+                whisper.textContent = `${DAYS[selectedDayIndex].name} Görevleri`;
+            }
+        }
+
+        /* =========================================================================
+         * 2. YAPIŞKAN MİNİ GÜN SEÇİCİYİ VE GÜNLÜK GÖREV LİSTESİNİ GÜNCELLE
+         * ========================================================================= */
+        function renderStickyMiniNav() {
+            const nav = document.getElementById('stickyMiniDays');
+            nav.innerHTML = '';
+
+            DAYS.forEach((day, idx) => {
+                const isSelected = idx === selectedDayIndex;
+                const stats = getDayStats(idx);
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.onclick = () => selectDay(idx, false);
+                btn.className = `w-7 h-7 rounded-full text-xs flex items-center justify-center transition-all duration-300 ${
+                    isSelected 
+                        ? 'bg-[#080808] text-[#F3F1ED] font-semibold scale-105 shadow-sm' 
+                        : 'text-[#6E6D6A] hover:text-[#080808] hover:bg-black/5'
+                }`;
+                btn.title = `${day.name} (${stats.completed}/${stats.total})`;
+                btn.textContent = day.letter;
+                nav.appendChild(btn);
+            });
+        }
+
+        function renderDailyTasks(animateStagger = false) {
+            const day = DAYS[selectedDayIndex];
+            const stats = getDayStats(selectedDayIndex);
+            const pct = Math.round(stats.ratio * 100);
+
+            // Header updates
+            document.getElementById('activeDayCode').textContent = day.code;
+            document.getElementById('activeDayTitle').textContent = day.name;
+            document.getElementById('activeDayCounterText').textContent = `${stats.completed} / ${stats.total} Görev`;
+            document.getElementById('activeDayPercentBig').textContent = `${pct}%`;
+
+            // Dynamic rhythm label & insight based on user's completion
+            const tempoLabel = document.getElementById('activeDayTempoLabel');
+            const insightText = document.getElementById('rhythmInsightText');
+
+            if (pct === 100 && stats.total > 0) {
+                tempoLabel.textContent = 'TAM REZONANS';
+                insightText.textContent = `${day.name} ritminiz zirvede. Ana grafikteki sütununuz maksimum uzunluğa ulaştı.`;
+            } else if (pct >= 60) {
+                tempoLabel.textContent = 'AKICI RİTİM';
+                insightText.textContent = `Dengeli bir akıştasınız. Günü zirvede kapatmak için ${stats.total - stats.completed} adım kaldı.`;
+            } else if (pct > 0) {
+                tempoLabel.textContent = 'BAŞLANGIÇ İVMESİ';
+                insightText.textContent = `Ritmi büyütmek için küçük bir görevi tamamlayarak sütunu yükseltin.`;
+            } else {
+                tempoLabel.textContent = 'SESSİZ BAŞLANGIÇ';
+                insightText.textContent = `${day.name} için ilk görevi işaretleyerek akışı başlatın.`;
+            }
+
+            // Filter tasks by period
+            const filtered = currentRhythmFilter === 'ALL'
+                ? tasks
+                : tasks.filter(t => t.period === currentRhythmFilter);
+
+            const listContainer = document.getElementById('tasksListContainer');
+            listContainer.innerHTML = '';
+
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="py-12 text-center text-sm text-[#6E6D6A] border border-dashed border-black/10 rounded-2xl">
+                        Bu zaman diliminde görev bulunmuyor.
+                    </div>
+                `;
+            } else {
+                filtered.forEach((task, i) => {
+                    const isCompleted = task.days[selectedDayIndex];
+                    const isFocusing = activeFocus.taskId === task.id;
+                    const weeklyDoneCount = task.days.filter(Boolean).length;
+                    const weightDots = '•'.repeat(Number(task.weight) || 1);
+
+                    let focusProgressPct = 0;
+                    let formattedTimer = task.duration;
+                    if (isFocusing && activeFocus.totalSeconds > 0) {
+                        focusProgressPct = ((activeFocus.totalSeconds - activeFocus.remainingSeconds) / activeFocus.totalSeconds) * 100;
+                        const mins = Math.floor(activeFocus.remainingSeconds / 60);
+                        const secs = activeFocus.remainingSeconds % 60;
+                        formattedTimer = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                    }
+
+                    const row = document.createElement('div');
+                    row.className = `task-row ${isCompleted ? 'completed-row' : ''} ${isFocusing ? 'focusing-row' : ''} ${animateStagger ? 'task-card-anim' : ''} rounded-2xl p-4 sm:px-6 sm:py-5 flex items-center justify-between gap-4 cursor-pointer group`;
+                    if (animateStagger) {
+                        row.style.animationDelay = `${i * 45}ms`;
+                    }
+
+                    row.onclick = (e) => {
+                        if (e.target.closest('.delete-btn') || e.target.closest('.focus-trigger-btn')) return;
+                        toggleTaskStatus(task.id, selectedDayIndex);
+                    };
+
+                    row.innerHTML = `
+                        <div class="flex items-center gap-4 sm:gap-5 min-w-0">
+                            <!-- Capsule Pill Checkbox (breathes silver when focusing) -->
+                            <div class="capsule-check" title="Tamamlandı olarak işaretle"></div>
+
+                            <div class="min-w-0">
+                                <p class="text-sm sm:text-base font-medium transition-all duration-300 ${
+                                    isCompleted ? 'line-through text-[#6E6D6A]' : 'text-[#080808]'
+                                }">
+                                    ${task.title}
+                                </p>
+                                <div class="flex flex-wrap items-center gap-2.5 mt-1 text-[11px] text-[#6E6D6A]">
+                                    <span class="uppercase tracking-wider font-medium">${task.period}</span>
+                                    <span>•</span>
+                                    <span class="font-semibold text-[#080808]/80 tracking-widest" title="Ritim Ağırlığı">${weightDots}</span>
+                                    <span>•</span>
+                                    <!-- Inline Breathable Focus Trigger Button -->
+                                    <button 
+                                        type="button"
+                                        onclick="toggleInlineFocus('${task.id}')"
+                                        class="focus-trigger-btn inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full transition ${
+                                            isFocusing 
+                                                ? 'bg-[#080808] text-[#F3F1ED] font-medium' 
+                                                : 'bg-black/[0.04] hover:bg-black/[0.1] text-[#080808]'
+                                        }"
+                                        title="${isFocusing ? 'Odak sayacını durdur' : 'Kart içi nefes alan odak sayacını başlat'}"
+                                    >
+                                        <span class="w-1.5 h-1.5 rounded-full ${isFocusing ? 'bg-[#F3F1ED] animate-ping' : 'bg-[#080808]'}"></span>
+                                        <span id="focus-timer-text-${task.id}">${formattedTimer}</span>
+                                    </button>
+                                    <span class="hidden sm:inline">•</span>
+                                    <span class="hidden sm:inline">Haftalık: ${weeklyDoneCount}/7</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3 flex-shrink-0">
+                            <!-- Mini 7-day bar indicator right inside the task card -->
+                            <div class="hidden sm:flex items-end gap-1 h-5 px-2" title="Bu görevin haftalık dağılımı">
+                                ${task.days.map((dDone, dIdx) => `
+                                    <span class="w-1 rounded-full transition-all duration-300 ${
+                                        dIdx === selectedDayIndex
+                                            ? (dDone ? 'h-4 bg-[#080808]' : 'h-2 bg-black/25')
+                                            : (dDone ? 'h-3 bg-black/50' : 'h-1.5 bg-black/10')
+                                    }"></span>
+                                `).join('')}
+                            </div>
+
+                            <button 
+                                type="button"
+                                onclick="deleteTask('${task.id}')"
+                                class="delete-btn w-8 h-8 rounded-full flex items-center justify-center text-[#6E6D6A] hover:text-[#080808] hover:bg-black/5 opacity-0 group-hover:opacity-100 transition"
+                                title="Görevi Kaldır"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        ${isFocusing ? `<div id="focus-bar-${task.id}" class="focus-hairline" style="width: ${focusProgressPct}%"></div>` : ''}
+                    `;
+
+                    listContainer.appendChild(row);
+                });
+            }
+
+            // Populate frameless single-line reflection input for the active day
+            const reflectionInput = document.getElementById('dailyReflectionInput');
+            if (reflectionInput) {
+                reflectionInput.value = reflections[selectedDayIndex] || '';
+                reflectionInput.placeholder = `${day.name} ritmini tek bir cümleyle mühürle...`;
+            }
+
+            // Update bottom weekly summary
+            let totalCompletedWeek = 0;
+            let totalPossibleWeek = tasks.length * 7;
+            tasks.forEach(t => {
+                t.days.forEach(d => { if (d) totalCompletedWeek++; });
+            });
+
+            let activeDaysStreak = 0;
+            for (let d = 0; d < 7; d++) {
+                if (getDayStats(d).completed > 0) activeDaysStreak++;
+            }
+
+            document.getElementById('weeklyTotalSummary').textContent = `${totalCompletedWeek} / ${totalPossibleWeek} Tamamlandı`;
+            document.getElementById('streakSummary').textContent = `${activeDaysStreak} Gün Aktif`;
+        }
+
+        /* =========================================================================
+         * 3. ETKİLEŞİMLER VE SMOOTH KAYDIRMA (MOTION) FONKSİYONLARI
+         * ========================================================================= */
+        function handleDayClickFromHero(dayIdx) {
+            const wasAlreadySelected = (dayIdx === selectedDayIndex);
+            selectDay(dayIdx, true);
+
+            // If user clicks the already active bar or after a brief moment on a new bar,
+            // smoothly glide down to the tasks or let them admire the metallic bar shift first
+            if (wasAlreadySelected) {
+                scrollToDailyFlow();
+            } else {
+                // Subtle delay so user sees the metallic bar transition on the hero before scrolling
+                setTimeout(() => {
+                    scrollToDailyFlow();
+                }, 420);
+            }
+        }
+
+        function selectDay(dayIdx, fromHero = false) {
+            selectedDayIndex = dayIdx;
+            playSoftClick(580, 'sine', 0.05);
+            renderHeroBars();
+            renderStickyMiniNav();
+            renderDailyTasks(true);
+        }
+
+        function toggleTaskStatus(taskId, dayIdx) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            task.days[dayIdx] = !task.days[dayIdx];
+            playSoftClick(task.days[dayIdx] ? 660 : 380, 'sine', 0.07);
+
+            saveTasksToStorage();
+            renderHeroBars();
+            renderStickyMiniNav();
+            renderDailyTasks(false);
+        }
+
+        function handleAddTask(e) {
+            e.preventDefault();
+            const input = document.getElementById('newTaskInput');
+            const period = document.getElementById('newTaskRhythmPeriod').value;
+            const weight = parseInt(document.getElementById('newTaskWeight').value, 10) || 2;
+            const title = input.value.trim();
+            if (!title) return;
+
+            const daysArr = [false, false, false, false, false, false, false];
+            // Mark as completed for the currently selected day so the user immediately sees the bar grow
+            daysArr[selectedDayIndex] = true;
+
+            const defaultMins = weight === 3 ? 45 : (weight === 2 ? 25 : 10);
+
+            tasks.unshift({
+                id: 'task_' + Date.now(),
+                title,
+                period,
+                duration: `${defaultMins} dk`,
+                minutes: defaultMins,
+                weight,
+                days: daysArr
+            });
+
+            input.value = '';
+            playSoftClick(720, 'triangle', 0.08);
+
+            saveTasksToStorage();
+            renderHeroBars();
+            renderStickyMiniNav();
+            renderDailyTasks(true);
+        }
+
+        /* =========================================================================
+         * 4. KART İÇİ NEFES ALAN ODAK SAYACI & GÜN SONU MÜHRÜ
+         * ========================================================================= */
+        function toggleInlineFocus(taskId) {
+            if (activeFocus.intervalId) {
+                clearInterval(activeFocus.intervalId);
+                activeFocus.intervalId = null;
+            }
+
+            // Clicking the already active timer stops it
+            if (activeFocus.taskId === taskId) {
+                activeFocus.taskId = null;
+                playSoftClick(420, 'sine', 0.05);
+                renderDailyTasks(false);
+                return;
+            }
+
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            const mins = task.minutes || parseInt(task.duration) || 15;
+            activeFocus.taskId = taskId;
+            activeFocus.totalSeconds = mins * 60;
+            activeFocus.remainingSeconds = mins * 60;
+            playSoftClick(640, 'sine', 0.07);
+
+            renderDailyTasks(false);
+
+            activeFocus.intervalId = setInterval(() => {
+                activeFocus.remainingSeconds--;
+
+                const timerTextEl = document.getElementById(`focus-timer-text-${taskId}`);
+                const barEl = document.getElementById(`focus-bar-${taskId}`);
+
+                if (timerTextEl) {
+                    const m = Math.floor(activeFocus.remainingSeconds / 60);
+                    const s = activeFocus.remainingSeconds % 60;
+                    timerTextEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                }
+                if (barEl && activeFocus.totalSeconds > 0) {
+                    const pct = ((activeFocus.totalSeconds - activeFocus.remainingSeconds) / activeFocus.totalSeconds) * 100;
+                    barEl.style.width = `${pct}%`;
+                }
+
+                if (activeFocus.remainingSeconds <= 0) {
+                    clearInterval(activeFocus.intervalId);
+                    activeFocus.intervalId = null;
+                    activeFocus.taskId = null;
+
+                    // Automatically mark task completed for the active day & grow the hero bar
+                    task.days[selectedDayIndex] = true;
+                    playSoftClick(880, 'triangle', 0.14);
+                    saveTasksToStorage();
+                    renderHeroBars();
+                    renderStickyMiniNav();
+                    renderDailyTasks(false);
+                }
+            }, 1000);
+        }
+
+        let reflectionTimeout = null;
+        function handleReflectionInput(val) {
+            reflections[selectedDayIndex] = val.trim();
+            saveReflectionsToStorage();
+            renderHeroBars();
+
+            const badge = document.getElementById('reflectionSavedBadge');
+            if (badge) {
+                badge.style.opacity = '1';
+                clearTimeout(reflectionTimeout);
+                reflectionTimeout = setTimeout(() => {
+                    badge.style.opacity = '0';
+                }, 1400);
+            }
+        }
+
+        function deleteTask(taskId) {
+            tasks = tasks.filter(t => t.id !== taskId);
+            playSoftClick(320, 'sine', 0.06);
+            saveTasksToStorage();
+            renderHeroBars();
+            renderStickyMiniNav();
+            renderDailyTasks(false);
+        }
+
+        function filterByRhythm(rhythm) {
+            currentRhythmFilter = rhythm;
+            playSoftClick(500, 'sine', 0.04);
+
+            document.querySelectorAll('.rhythm-btn').forEach(btn => {
+                if (btn.dataset.rhythm === rhythm) {
+                    btn.className = 'rhythm-btn px-3 py-1 rounded-full bg-[#080808] text-[#F3F1ED] font-medium transition';
+                } else {
+                    btn.className = 'rhythm-btn px-3 py-1 rounded-full text-[#6E6D6A] hover:text-[#080808] transition';
+                }
+            });
+
+            renderDailyTasks(true);
+        }
+
+        function completeAllForSelectedDay() {
+            tasks.forEach(t => {
+                t.days[selectedDayIndex] = true;
+            });
+            playSoftClick(780, 'sine', 0.09);
+            saveTasksToStorage();
+            renderHeroBars();
+            renderStickyMiniNav();
+            renderDailyTasks(true);
+        }
+
+        function resetToOriginalVisual() {
+            if (activeFocus.intervalId) {
+                clearInterval(activeFocus.intervalId);
+                activeFocus.intervalId = null;
+                activeFocus.taskId = null;
+            }
+            tasks = JSON.parse(JSON.stringify(INITIAL_TASKS));
+            reflections = { ...INITIAL_REFLECTIONS };
+            selectedDayIndex = 4; // Thursday 'T'
+            playSoftClick(600, 'sine', 0.08);
+            saveTasksToStorage();
+            saveReflectionsToStorage();
+            renderHeroBars();
+            renderStickyMiniNav();
+            renderDailyTasks(true);
+            scrollToTopHero();
+        }
+
+        function scrollToDailyFlow() {
+            const section = document.getElementById('dailyFlowSection');
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function scrollToTopHero() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // IntersectionObserver for smooth fade-in when scrolling down from the pure hero
+        function setupScrollReveal() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.12 });
+
+            document.querySelectorAll('.reveal-section').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        window.onload = function () {
+            renderHeroBars();
+            renderStickyMiniNav();
+            renderDailyTasks(true);
+            setupScrollReveal();
+        };
+    </script>
+</body>
+</html>
